@@ -1,14 +1,16 @@
+const MOVIES_URL = "https://flatdango-pink.vercel.app/db.json";
+
 let films = [];
 let selectedFilm = null;
 
 function fetchMovies() {
-    fetch('http://localhost:3000/films')
+    fetch(MOVIES_URL)
         .then(response => response.json())
         .then(data => {
-            films = data;  
+            films = data.films;  
             renderMovieList(films);
             if (films.length > 0) {
-                renderFilm(films[0]);  
+                renderFilm(films[0]);
             }
         });
 }
@@ -49,7 +51,7 @@ function renderFilm(film) {
     let availableTickets = film.capacity - film.tickets_sold;
 
     let movieDetails = document.getElementById('movie-details');
-    movieDetails.innerHTML = '';  
+    movieDetails.innerHTML = ''; 
 
     let mainMovie = document.createElement('div');
     mainMovie.innerHTML = `
@@ -71,7 +73,8 @@ function renderFilm(film) {
             availableTickets--;
             document.getElementById('available-tickets').innerText = availableTickets;
 
-            fetch(`http://localhost:3000/films/${film.id}`, {
+            // Update the backend (assumes a PATCH endpoint is available)
+            fetch(`${MOVIES_URL}/${film.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,11 +83,12 @@ function renderFilm(film) {
             }).then(() => {
                 if (availableTickets === 0) {
                     document.getElementById('buy-ticket').innerText = 'Sold Out!';
-                    document.getElementById('buy-ticket').disabled = true;
+                    //document.getElementById('buy-ticket').disabled = true;
                 }
             });
+            
         }
     });
 }
 
-fetchMovies();
+document.addEventListener("DOMContentLoaded", fetchMovies);
